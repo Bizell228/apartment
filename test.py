@@ -1,49 +1,71 @@
-# apartment_parser.py
+import requests
+from bs4 import BeautifulSoup
+import collections
+import csv
+import transliterate
+import re
+from config.public_config import BaseConfig
 
-from seleniumwire import webdriver 
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, StaleElementReferenceException
-import time
-import pandas as pd
-from tqdm import tqdm
+apartmentInfo = collections.namedtuple(
+    'apartmentInfo',
+    [
+        'price',
+        'rooms',
+        'street',
+        'district',
+        'subway_station_time',
+        'floor',
+        'floors_total',
+        'square_meters',
+        'commissions',
+        'author',
+        'building_year',
+        'living_space',
+        'kitchen_meters',
+        'link'
+    ]
+)
 
-def create_driver(config):
-    options = Options()
-    options.binary_location = config.CHROMIUM_PATH
-    options.add_argument("--headless")
-    
-    seleniumwire_options = {
-        'proxy': {
-            'http': f'socks5://{config.PROXY_USER}:{config.PROXY_PASS}@{config.PROXY_HOST}:{config.PROXY_PORT}',
-            'https': f'socks5://{config.PROXY_USER}:{config.PROXY_PASS}@{config.PROXY_HOST}:{config.PROXY_PORT}',
+max_pages = BaseConfig.MAX_PAGES
+
+class CianPasrer:
+    def __init__(self):
+        self.session = requests.Session()
+        self.sesion.headers = {
+            'User-Agent' : f'Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0', 
+            'Accept-Language': 'ru'
         }
-    }
-    
-    service = Service(config.CHROMEDRIVER_PATH)
-    return webdriver.Chrome(
-        service=service, 
-        options=options, 
-        seleniumwire_options=seleniumwire_options
-    )
-    
+        self.result = []
+        self.result.append(apartmentInfo(
+            price = 'price',
+            rooms = 'rooms',
+            street = 'street',
+            district = 'district',
+            subway_station_time = 'subway_station_time',
+            floor = 'floor',
+            floors_total = 'floors_total',
+            square_meters = 'square_meters',
+            commissions = 'commissions',
+            author = 'author',
+            building_year = 'building_year',
+            living_space = 'living_space',
+            kitchen_meters = 'kitchen_meters',
+            link = 'link'
+             ))
 
+    #Loading page    
+    def load_page(self, i=1):
+        pass
 
-if __name__ == '__main__' :
-    from config.private_config import ProdConfig
-    config=ProdConfig()
-    driver = create_driver(config)
-    wait = WebDriverWait(driver, config.WAIT_TIMEOUT)
-    driver.get(config.URL)
-    wait.until(EC.presence_of_element_located((By.CLASS_NAME, "product-item")))
-    card = driver.find_element(By.CLASS_NAME, 'a-images')
-    link = card.get_attribute('href')
-    driver.get(link)
-    wait.until(EC.presence_of_element_located((By.CLASS_NAME, 'product-image-section')))
-    first = driver.find_element(By.CLASS_NAME, 'prominent')
-    info_first = first.find_elements(By.CSS_SELECTOR, '.prominent span')
-    info_text = [inf.text for inf in info_first]
-    print(info_text)
+    #will get html
+    def parse_page(self, html: str):
+        pass
+    
+    #parse
+    def parse_page_offer(self, html_offer):
+        pass
+    
+    #
+    def parse_block(self, block):
+        pass
+
